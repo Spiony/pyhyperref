@@ -3,6 +3,7 @@ from pylatex import Document, Command, NoEscape
 from pylatex.basic import NewLine
 from pylatex.base_classes import LatexObject
 from pyhyperref.hyperref import FormEnvironment, HyperRefCommand
+from pyhyperref.utils import Quantity
 
 from pylatex.package import Package
 
@@ -13,19 +14,22 @@ class DefCommand(Command):
         return r"\def" + super().dumps()
 
 
+baseLineSkip = Command("baselineskip")
+
+
 @dataclass
 class HyperRefDefaults:
-    heightofSubmit: str = "12pt"
-    widthofSubmit: str = "2cm"
-    heightofReset: str = "12pt"
-    widthofReset: str = "2cm"
-    heightofCheckBox: str = r"0.8\baselineskip"
-    widthofCheckBox: str = r"0.8\baselineskip"
-    heightofChoiceMenu: str = r"0.8\baselineskip"
-    widthofChoiceMenu: str = r"0.8\baselineskip"
-    heightofText: str = r"\baselineskip"
-    heightofTextMultiline: str = r"4\baselineskip"
-    widthofText: str = "3cm"
+    heightofSubmit: str | Command = Quantity(12, "pt")
+    widthofSubmit: str | Command = Quantity(2, "cm")
+    heightofReset: str | Command = Quantity(12, "pt")
+    widthofReset: str | Command = Quantity(2, "cm")
+    heightofCheckBox: str | Command = Quantity(0.8, baseLineSkip)
+    widthofCheckBox: str | Command = Quantity(0.8, baseLineSkip)
+    heightofChoiceMenu: str | Command = Quantity(0.8, baseLineSkip)
+    widthofChoiceMenu: str | Command = Quantity(0.8, baseLineSkip)
+    heightofText: str | Command = Quantity(0.8, baseLineSkip)
+    heightofTextMultiline: str | Command = Quantity(0.8, baseLineSkip)
+    widthofText: str | Command = Quantity(3, "cm")
 
 
 class FormDocument(Document):
@@ -43,9 +47,7 @@ class FormDocument(Document):
             name = field.name
             value = getattr(hyperRefDefaults, field.name)
             self.preamble.append(
-                DefCommand(
-                    "Default" + name[0].upper() + name[1:], arguments=NoEscape(value)
-                )
+                DefCommand("Default" + name[0].upper() + name[1:], arguments=value)
             )
 
         self.formVariables: list[str] = []

@@ -1,11 +1,14 @@
 from pylatex.utils import NoEscape
 from pylatex.base_classes import (
+    Command,
     Environment,
     CommandBase,
     SpecialArguments,
 )
 from pylatex.base_classes.command import Options, Arguments
 from pylatex.package import Package
+
+from pyhyperref.utils import Quantity
 
 
 class FormEnvironment(Environment):
@@ -52,12 +55,12 @@ class ChoiceMenu(HyperRefCommand):
         name: str,
         choices: list[str],
         label: str = "",
-        width: str = r"0.8\linewidth",
+        width: str = Quantity(0.8, Command("linewidth")).dumps(),
     ):
         self._name = name
 
-        opt = Options("print", "combo", name=name, width=NoEscape(width))
         opt = Options("combo", name=name)
+        # opt = Options("print", "combo", name=name, width=width)
         opt.escape = False
 
         super().__init__(
